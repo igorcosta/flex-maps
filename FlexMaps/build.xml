@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<project name="FlexMaps" default="main" basedir=".">
+ 
+    <property name="FLEX_HOME" value="C:\sdks\flex\4.6.0"/>
+    <taskdef resource="flexTasks.tasks"
+        classpath="C:\sdks\flex\4.8\ant\lib\flexTasks.jar" />
+ 
+    <echo message="Flex Home ${FLEX_HOME} "/>
+ 
+    <target name="main" depends="compile, doc" description="Clean build of library swc" />
+	<target name="All" depends="compile, doc,asDocs" description="Clean build of library swc" />
+    <echo message="clean"/>
+ 
+    <target name="clean" depends="clean-temp-docs">
+        <delete failonerror="false">
+            <fileset dir="${basedir}\bin">
+                <include name="${ant.project.name}.swc"/>
+            </fileset>
+        </delete>
+    </target>
+ 
+    <target name="compile" depends="" description="Compile SWC">
+ 
+        <echo message="Compiling ${ant.project.name}.swc"/>
+ 
+        <compc fork="true" output="${basedir}\bin\${ant.project.name}.swc">
+            <source-path path-element="${basedir}\src"/>
+            <include-sources dir="${basedir}\src" includes="**\*.as **\*.mxml"/>
+            <compiler.include-libraries dir="${basedir}\bin\" append="true">
+                <include name="agslib-2.2-2010-12-08.swc" />
+            </compiler.include-libraries>
+            <jvmarg value="-Xmx1024m"/>
+        </compc>
+ 
+    </target>
+ 
+    <target name="doc" depends="clean-temp-docs, compile"
+        description="Updates SWC with ASDoc XML">
+        <echo message="Compiling ASDoc for ${ant.project.name}.swc"/>
+ 
+        <!-- Call asdoc to generate dita xml files -->
+        <asdoc output="${basedir}\docs" lenient="true"
+            failonerror="true" keep-xml="true" skip-xsl="true" fork="true">
+            <compiler.source-path path-element="${basedir}\src"/>
+            <doc-sources path-element="${basedir}\src"/>
+            <jvmarg value="-Xmx1024m"/>
+        </asdoc>
+ 
+        <!-- updates swc with asdoc xml -->
+        <zip destfile="${basedir}\bin\${ant.project.name}.swc" update="true">
+            <zipfileset dir="${basedir}\docs\tempdita" prefix="docs">
+                <include name="*.*"/>
+                <exclude name="ASDoc_Config.xml"/>
+                <exclude name="overviews.xml"/>
+            </zipfileset>
+        </zip>
+    </target>
+ 
+    <target name="clean-temp-docs">
+        <delete dir="${basedir}\tempDoc" failonerror="false" includeEmptyDirs="true"/>
+    </target>
+	
+	<!-- generate asdocs -->
+	
+	<target name="asDocs" depends="cleanASDoc,compileASDoc" description="build of asdocs" />
+	<!-- Delete the existing output folder and files and then regenerate the output folder -->
+    <target name="cleanASDoc">
+        <echo>Deleting ASDoc Directory...</echo>
+        <delete dir="as-docs" failOnError="false" includeEmptyDirs="true" />
+        <echo>Deleted ASDoc Directory</echo>
+        <echo>Creating ASDoc Directory...</echo>
+        <mkdir dir="as-docs" />
+        <echo>Created ASDoc Directory</echo>
+	</target>
+	<!-- Run the ASDoc executable and generate the ASDocs to the new output folder -->
+    <target name="compileASDoc">
+        <echo>ASDoc Compiling...</echo>
+        <exec executable="${FLEX_HOME}\bin\asdoc.exe" failonerror="true">
+            <arg line="-doc-sources '${basedir}/src'" />
+         
+          <!-- 
+             <arg line="-doc-sources '${LibrarySrc.dir}'" /> 
+          	<arg line="-external-library-path '${LibrarySrc.dir}'" />
+            <arg line="-external-library-path '${Library.dir}/${LibraryLibs.dir}'" /> -->
+            <arg line="-main-title 'Apache Flex Open Maps'" />
+            <arg line="-window-title 'Apache Flex Open Maps'" />
+            <arg line="-output 'as-docs'" />
+            <arg line="-footer 'Apache Flex http://flex.apache.org'" />
+        </exec>
+        <echo>ASDoc Compile Complete</echo>
+    </target>
+</project>
