@@ -19,7 +19,7 @@ feature releases to support Google Maps
 
 <h2>Using it's pretty simple:</h2>
 
-<code>
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
@@ -69,7 +69,7 @@ feature releases to support Google Maps
 									 zoom="12" center="-9.4384955,-40.3835929,12,0,0"
 									 doubleClick="myMap.map.onDoubleClick(event)" />
 </s:Application>
-</code>
+```
 
 
 This project is a based on ModestMap technology.
